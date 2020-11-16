@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<title>GraphQL</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<style>
+		div {
+			padding-left: 100px;
+			font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+		}
+
+		div.mainHeading {
+			text-align: center;
+		}
+
+		div.subHeading {
+			padding-top: 10px;
+			font-size: x-large;
+		}
+
+		div.normalText {
+			padding-bottom: 10px;
+			padding-top: 10px;
+			font-size: medium;
+		}
+
+		div.code {
+			padding-bottom: 20px;
+			padding-top: 20px;
+			font-size: medium;
+			padding-left: 150px;
+			border: 1px solid;
+			width: 50%;
+		}
+
+		img {
+			width: 700px;
+			height: 500px;
+		}
+
+		pre.cscode {
+			overflow: auto;
+			background-color: #ffffff;
+		}
+
+		.cscode code {
+			font-family: Consolas, "Courier New", Courier, Monospace;
+			font-size: 10pt;
+			color: #000000;
+		}
+
+		.cscode .key {
+			color: #0000ff;
+		}
+
+		.cscode .com {
+			color: #008000;
+		}
+
+		.cscode .str {
+			color: #a31515;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="mainHeading">
+		<h2><u> GraphQL API with .Net Core 3.1</u></h2>
+	</div>
+	<div class="subHeading">
+		Prerequisites
+	</div>
+	<div class="normalText">
+		You should have Visual Studio 2019 with .Net Core 3.1 installed on your system.
+	</div>
+	<div class="subHeading">
+		Getting Started
+	</div>
+	<div class="normalText">
+		1. Open Visual Studio 2019.<br><br>
+		Click Create New Project and Select ASP.Net Core Web Application. Press Next button at right bottom.
+		<br><br>
+		<img src="../img/graphql/VS2019_ProjectSelection.png" /><br><br>
+
+		2. On Next screen Enter Project Name. For Current example it is GraphQLProject. Press Create button at right
+		bottom.<br><br>
+
+		3. On the next screen select items as shown in below image. Press Create button at right bottom.<br><br>
+		<img src="../img/graphql/VS2019_ProjectCreate.png" /><br><br>
+
+		4. Once the Project is created install below Nuget packages. TO install these packages open Solution Explorer >>
+		Right click on the project >> Select Manage Nuget package.<br>
+		From Browse Tab, search for below packages and install them.
+		<div class="code">
+			1. GraphQL Version 2.4.0<br>
+			2. GraphiQL Version 2.0.0<br>
+			3. GraphQL.Server.Transports.AspNetCore Version 3.4.0<br>
+		</div>
+		<br><br>
+
+		5. Open the Startup.cs class and add namespace <br>
+		&nbsp;&nbsp;&nbsp;
+
+		<pre class="cscode"><code><span class="key">using</span> GraphiQl;</code></pre>
+
+		<br><br>
+		Change Configure method like below:<br><br>
+
+		<pre class="cscode"><code> <span class="key">public</span> <span class="key">void</span> Configure(IApplicationBuilder app, IWebHostEnvironment env)
+			{
+				<span class="key">if</span> (env.IsDevelopment())
+				{
+					app.UseDeveloperExceptionPage();
+				}
+	
+				app.UseGraphiQl(<span class="str">"/graphql"</span>);
+				app.UseMvc();
+				app.UseRouting();         
+			}</code></pre>
+			Configure is used to set up middlewares, routing rules, etc
+		<br><br>
+
+		Now run the application. The page will be shown like below:<br><br>
+		<img src="../img/graphql/GraphQL_1Page.JPG" />
+	</div>
+	<div class="subHeading">
+		Building Entities
+	</div>
+	<div class="normalText">
+		Now create the below entities. For this right click on the project and Add New Folder. Add below classes
+		<br><br>
+		<pre class="cscode"><code>
+			<span class="key">public</span><span class="key">class</span> Employee			
+			 {
+				<span class="key">public</span> <span class="key">int</span> Id { <span class="key">get</span>; <span class="key">set</span>; }
+		
+				<span class="key">public</span> <span class="key">string</span> FirstName { <span class="key">get</span>; <span class="key">set</span>; }
+		
+				<span class="key">public</span> <span class="key">string</span> LastName { <span class="key">get</span>; <span class="key">set</span>; }
+		
+				<span class="key">public</span> <span class="key">int</span> Salary { <span class="key">get</span>; <span class="key">set</span>; }
+			 }</code></pre>
+	</div>
+	<div class="subHeading">
+		Build Repository class. For current example instead of fetching data from database, we will fetch data from hard
+		coded collection.<br><br>
+
+		<pre class="cscode"><code><span class="key">public</span> <span class="key">class</span> EmployeeRepository
+		{
+				<span class="key">private</span> <span class="key">readonly</span> List&lt;Models.Employee&gt; _employee = <span class="key">new</span> List&lt;Models.Employee&gt;();
+		
+				<span class="key">public</span> EmployeeRepository()
+				{
+					Models.Employee employee1 = <span class="key">new</span> Models.Employee
+					{
+						Id = 1,
+						FirstName = <span class="str">"First Name 1"</span>,
+						LastName = <span class="str">"Last Name 1"</span>,
+						Salary = 1000
+					};
+					Models.Employee employee2 = <span class="key">new</span> Models.Employee
+					{
+						Id = 2,
+						FirstName = <span class="str">"First Name 2"</span>,
+						LastName = <span class="str">"Last Name 2"</span>,
+						Salary = 2000
+					};
+					Models.Employee employee3 = <span class="key">new</span> Models.Employee
+					{
+						Id = 3,
+						FirstName = <span class="str">"First Name 3"</span>,
+						LastName = <span class="str">"Last Name 3"</span>,
+						Salary = 3000
+					};
+		
+		
+		
+		
+					_employee.Add(employee1);
+					_employee.Add(employee2);
+					_employee.Add(employee3);
+				}
+		
+				<span class="key">public</span> List&lt;Models.Employee&gt; GetAll()
+				{
+					<span class="key">return</span> _employee;
+				}
+		
+				<span class="key">public</span> Models.Employee GetById(<span class="key">int</span> id)
+				{
+					<span class="key">return</span> _employee.Where(x =&gt; x.Id == id).FirstOrDefault();
+				}
+		
+		
+		}</code></pre>
+	</div>
+	<div class="subHeading">
+		Build Service class. This class will fetch data from the repository.<br><br>
+
+		<pre class="cscode"><code> <span class="key">public</span> <span class="key">class</span> EmployeeService
+		{
+				<span class="key">private</span> EmployeeRepository _employeeRepository ;
+				<span class="key">public</span> EmployeeService(EmployeeRepository employeeRepository)
+				{
+					_employeeRepository = employeeRepository;
+				}
+		
+				<span class="key">public</span> List&lt;Models.Employee&gt; GetAll()
+				{
+					<span class="key">return</span> _employeeRepository.GetAll();
+				}
+		
+				<span class="key">public</span> Models.Employee GetById(<span class="key">int</span> id)
+				{
+					<span class="key">return</span> _employeeRepository.GetById(id);
+				}
+		}</code></pre>
+	</div>
+
+	<div class="subHeading">
+		Build GraphQL Schema.<br><br>
+	</div>
+	<div class="normalText">
+		To query data using GraphQL, you should create a type that extends ObjectGraphType<T> and pass the entity type
+			as an argument. You should also register the properties of the class as “Field” types so that GraphQL can
+			recognize this type.<br>
+
+			To achieve this, create a folder for Types and create the Employee class as shown below.<br><br>
+
+			<pre class="cscode"><code> <span class="key">public</span> <span class="key">class</span> EmployeeType : ObjectGraphType&lt;Models.Employee&gt;
+			{
+				<span class="key">public</span> EmployeeType()
+				{
+					Name = <span class="str">"Employee"</span>;
+					Field(_ =&gt; _.Id).Description(<span class="str">"Employee Id"</span>);
+					Field(_ =&gt; _.FirstName).Description(<span class="str">"Employee First Name"</span>);
+					Field(_ =&gt; _.LastName).Description(<span class="str">"Employee Last Name"</span>);
+					Field(_ =&gt; _.Salary).Description(<span class="str">"Employee Salary"</span>);
+				}
+			}</code></pre>
+	</div>
+
+	<div class="subHeading">
+		Build Query class.<br><br>
+	</div>
+	<div class="normalText">
+		Now you need a class that will fetch data of the employees. This class with extend ObjectGraphType. The below
+		namespace will be required:<br>
+		using GraphQL.Types;<br>
+		using GraphQLProject.OType;<br><br>
+
+		To achieve this create a folder for Query and
+		EmployeeQuery class like below.<br><br>
+
+		<pre class="cscode"><code><span class="key">public</span> <span class="key">class</span> EmployeeQuery : ObjectGraphType
+			{
+				<span class="key">public</span> EmployeeQuery(Service.EmployeeService employeeService)
+				{
+					<span class="key">int</span> id = 0;
+		
+					Field&lt;ListGraphType&lt;EmployeeType&gt;&gt;(
+						name: <span class="str">"employees"</span>, resolve: context =&gt;
+						{
+							<span class="key">return</span> employeeService.GetAll();
+						});
+		
+					Field&lt;EmployeeType&gt;(
+						name: <span class="str">"employee"</span>, 
+						arguments:<span class="key">new</span> QueryArguments(<span class="key">new</span> QueryArgument&lt;IntGraphType&gt; { Name=<span class="str">"id"</span>}),
+						resolve: context =&gt;
+						{
+							<span class="key">return</span> employeeService.GetById(id);
+						});
+				}
+			}</code></pre>
+	</div>
+
+	<div class="normalText">
+		Now create the GraphQL DTO and Schema class. The schema will extend the GraphQL.Types.Schema class.This will
+		make your query known and available to GraphQL. <br>
+		This class accepts the DependencyResolver that is added to the services collection in the ConfigureServices
+		method of the Startup class.<br><br>
+
+		<pre class="cscode"><code> <span class="key">public</span> <span class="key">class</span> GraphqlDTO
+			{
+				<span class="key">public</span> <span class="key">string</span> OperationName { <span class="key">get</span>; <span class="key">set</span>; }
+				<span class="key">public</span> <span class="key">string</span> NamedQuery { <span class="key">get</span>; <span class="key">set</span>; }
+				<span class="key">public</span> <span class="key">string</span> Query { <span class="key">get</span>; <span class="key">set</span>; }
+				<span class="key">public</span> JObject Variables { <span class="key">get</span>; <span class="key">set</span>; }
+			}</code></pre><br><br>
+
+
+		Below namespaces will be required for the below class:<br>
+
+		using GraphQL;<br>
+		using GraphQL.Types;<br>
+		using GraphQLProject.Query;<br>
+
+
+
+		<pre class="cscode"><code><span class="key">public</span> <span class="key">class</span> EmployeeSchema : Schema
+				{
+					<span class="key">public</span> EmployeeSchema(IDependencyResolver resolver):
+						<span class="key">base</span>(resolver)
+					{
+						Query = resolver.Resolve&lt;EmployeeQuery&gt;();
+					}
+				}</code></pre>
+
+	</div>
+
+	<div class="subHeading">
+		Add Controller Class.
+	</div>
+	<div class="normalText">
+		<pre class="cscode">
+			<code> [Route(<span class="str">"graphql"</span>)]
+			[ApiController]
+			<span class="key">public</span> <span class="key">class</span> GraphQLController : ControllerBase
+			{
+				<span class="key">private</span> <span class="key">readonly</span> IDocumentExecuter _documentExecuter;
+				<span class="key">private</span> <span class="key">readonly</span> ISchema _schema;
+		
+				<span class="key">public</span> GraphQLController(ISchema schema, IDocumentExecuter documentExecuter)
+				{
+					_schema = schema;
+					_documentExecuter = documentExecuter;
+				}
+		
+				[HttpPost]
+				<span class="key">public</span> <span class="key">async</span> Task&lt;IActionResult&gt; PostAsync([FromBody] GraphqlDTO query)
+				{
+					<span class="key">if</span> (query == <span class="key">null</span>) { <span class="key">throw</span> <span class="key">new</span> ArgumentNullException(nameof(query)); }
+		
+					<span class="key">var</span> inputs = query.Variables.ToInputs();
+					<span class="key">var</span> executionOptions = <span class="key">new</span> ExecutionOptions
+					{
+						Schema = _schema,
+						Query = query.Query,
+						Inputs = inputs
+					};
+		
+					<span class="key">var</span> result = <span class="key">await</span> _documentExecuter.ExecuteAsync(executionOptions);
+		
+					<span class="key">if</span> (result.Errors?.Count &gt; 0)
+					{
+						<span class="key">return</span> BadRequest(result);
+					}
+		
+					<span class="key">return</span> Ok(result);
+				}
+			}</code></pre>
+	</div>
+
+	<div class="normalText">
+		Now modify the Startup.cs class and change the ConfigureServices emthod like below:<br><br>
+
+		<pre class="cscode"><code> <span class="key">public</span> <span class="key">void</span> ConfigureServices(IServiceCollection services)
+			{
+				services.AddScoped&lt;IDependencyResolver&gt;(_ =&gt; <span class="key">new</span> FuncDependencyResolver(_.GetRequiredService));
+				services.AddSingleton&lt;IDocumentExecuter, DocumentExecuter&gt;();
+				services.AddScoped&lt;IDocumentWriter, DocumentWriter&gt;();
+	
+				services.AddScoped&lt;EmployeeService&gt;();
+	
+				services.AddScoped&lt;EmployeeRepository&gt;();
+	
+				services.AddScoped&lt;EmployeeQuery&gt;();
+	
+				services.AddScoped&lt;EmployeeType&gt;();
+	
+				services.AddScoped&lt;ISchema, EmployeeSchema&gt;();
+	
+				services.AddControllers(options =&gt; options.EnableEndpointRouting = <span class="key">false</span>);
+			}</code></pre>
+
+			Here we are adding all the required dependency of the classes.ConfigureServices is used to configure Dependency Injection.
+	</div>
+
+	<div class="normalText">
+		Now the solution explorer of your project will look like below :<br><br>
+
+		<img src="../img/graphql/VS2019_SE.png"/>
+	</div>
+
+	<div class="subHeading">
+		Run the appliction.
+	</div>
+	<div class="normalText">
+		Now run the application. The default browser will be opened and the default GraphQL page will be opened as mentioned in Step 5.
+
+		Execute the below queries from the browser and you will get the result as shown below:<br><br>
+
+		<img src="../img/graphql/Query_All_1.png" /><br>
+
+		<img src="../img/graphql/Query_All_2.png" /><br>
+
+		<img src="../img/graphql/Query_ById_1.png" /><br>
+	</div>
+</body>
+
+</html>
